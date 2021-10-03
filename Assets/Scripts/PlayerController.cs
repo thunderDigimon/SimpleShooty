@@ -64,4 +64,9 @@ public class PlayerController : MonoBehaviour
         return Physics.Raycast(transform.position, -Vector3.up, mGroundDistance + 0.1f);
     }
 
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        Debug.LogError("Player Touched ---- " + hit.collider.gameObject.name);
+    }
+
 }
