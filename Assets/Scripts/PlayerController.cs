@@ -1,11 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
     [SerializeField]
-    private GameObject m_RangeSensor;
+    private AbstractWeapon m_CurrentWeapon;
+
+    [SerializeField]
+    private GameObject m_RangeSensorPrefab;
 
     [SerializeField]
     private float m_PlayerMoveSpeed;
@@ -20,26 +21,46 @@ public class PlayerController : MonoBehaviour
     public float m_Gravity;
 
     private float mGroundDistance;
+    private bool m_Moving;
+
+    private RangeSensor m_RangeSensor;
 
     void Start()
     {
         mGroundDistance = m_Player.bounds.extents.y;
         SpawnRangeSensor();
+
+        GameEventManager.Instance.UnregisterEventObserver(GameEvent.POINTER_STATUS, OnPointerStatus);
+        GameEventManager.Instance.RegisterEventObserver(GameEvent.POINTER_STATUS, OnPointerStatus);
+    }
+
+    void OnPointerStatus(object inStatus)
+    {
+        m_Moving = (bool)inStatus;
     }
 
     void SpawnRangeSensor()
     {
-        GameObject sensor = Instantiate(m_RangeSensor, Vector3.zero, Quaternion.identity, transform);
+        GameObject sensor = Instantiate(m_RangeSensorPrefab, Vector3.zero, Quaternion.identity, transform);
+        m_RangeSensor = sensor.GetComponent<RangeSensor>();
+        m_RangeSensor.Init(this);
         sensor.transform.SetAsLastSibling();
     }
 
     // Update is called once per frame
     public void FixedUpdate()
     {
-        Vector3 direction = Vector3.forward * m_JoystickController.Vertical + Vector3.right * m_JoystickController.Horizontal;
-        transform.rotation = Quaternion.LookRotation(direction);
-        direction.y = m_Gravity;
-        m_Player.Move(direction * m_PlayerMoveSpeed * Time.deltaTime);
+        if (m_Moving)
+        {
+            Vector3 direction = Vector3.forward * m_JoystickController.Vertical + Vector3.right * m_JoystickController.Horizontal;
+            transform.rotation = Quaternion.LookRotation(direction);
+            direction.y = m_Gravity;
+            m_Player.Move(direction * m_PlayerMoveSpeed * Time.deltaTime);
+        }
+        else
+        {
+            m_RangeSensor.CheckForAutoFire();
+        }
 
         ApplyGravity();
     }
@@ -49,13 +70,11 @@ public class PlayerController : MonoBehaviour
         // apply gravity effect
         if (!isGrounded())
         {
-            Debug.Log("I am NOT grounded. Gravity = " + m_Gravity.ToString());
             m_Gravity += (Physics.gravity.y) * Time.deltaTime;
         }
         else
         {
             m_Gravity = 0f;
-            Debug.Log("Grounded. Gravity = " + m_Gravity.ToString());
         }
     }
 
@@ -67,6 +86,21 @@ public class PlayerController : MonoBehaviour
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
         Debug.LogError("Player Touched ---- " + hit.collider.gameObject.name);
+    }
+
+    public void FireTarget(GameObject inTarget)
+    {
+        if (inTarget != null)
+        {
+            Vector3 direction = inTarget.transform.position - transform.position;
+            transform.rotation = Quaternion.LookRotation(direction);
+            m_CurrentWeapon.Fire(inTarget.transform);
+        }
+    }
+
+    void OnDestroy()
+    {
+        GameEventManager.Instance.UnregisterEventObserver(GameEvent.POINTER_STATUS, OnPointerStatus);
     }
 
 }
