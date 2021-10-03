@@ -14,18 +14,33 @@ public class RangeSensor : MonoBehaviour
         m_Player = inPlayer;
         m_RigidBody = GetComponent<Rigidbody>();
         m_EnemiesInRange = new List<GameObject>();
+        GameEventManager.Instance.UnregisterEventObserver(GameEvent.ENEMY_KILLED, onEnemyKilled);
+        GameEventManager.Instance.RegisterEventObserver(GameEvent.ENEMY_KILLED, onEnemyKilled);
     }
+
+    private void onEnemyKilled(object obj)
+    {
+        GameObject enemy = obj as GameObject;
+
+        if (enemy != null)
+        {
+            RemoveEnemyFromRange(enemy);
+        }
+    }
+
     void OnCollisionEnter(Collision collision)
     {
         if (m_Player != null)
         {
             if (collision != null && isEnemy(collision.gameObject))
             {
+                GameObject go = collision.gameObject;
                 if (!m_EnemiesInRange.Contains(collision.gameObject))
                 {
                     m_EnemiesInRange.Add(collision.gameObject);
                     var dist = Vector3.Distance(collision.transform.position, transform.position);
                 }
+                go.GetComponent<Enemy>().OnPlayerInRange(gameObject);
             }
         }
     }
@@ -37,16 +52,21 @@ public class RangeSensor : MonoBehaviour
 
     void OnCollisionExit(Collision other)
     {
-        if (m_CurrentAimedObject == other.gameObject)
+        RemoveEnemyFromRange(other.gameObject);
+    }
+
+    void RemoveEnemyFromRange(GameObject other)
+    {
+        if (m_CurrentAimedObject == other)
             m_CurrentAimedObject = null;
 
-        if (other != null && isEnemy(other.gameObject))
+        if (other != null && isEnemy(other))
         {
-            print("No longer in contact with " + other.transform.name);
-            if (m_EnemiesInRange.Contains(other.gameObject))
+            if (m_EnemiesInRange.Contains(other))
             {
-                m_EnemiesInRange.Remove(other.gameObject);
+                m_EnemiesInRange.Remove(other);
             }
+            other.GetComponent<Enemy>().OnPlayerOutRange(gameObject);
         }
     }
 
@@ -60,7 +80,6 @@ public class RangeSensor : MonoBehaviour
             //TODO: based on nearest distance
             m_CurrentAimedObject = m_EnemiesInRange.Count > 0 ? m_EnemiesInRange[0] : null;
         }
-
         transform.position = m_Player.transform.position;
     }
 
@@ -70,6 +89,11 @@ public class RangeSensor : MonoBehaviour
         {
             m_Player.FireTarget(m_CurrentAimedObject);
         }
+    }
+
+    void OnDestroy()
+    {
+        GameEventManager.Instance.UnregisterEventObserver(GameEvent.ENEMY_KILLED, onEnemyKilled);
     }
 
 }
