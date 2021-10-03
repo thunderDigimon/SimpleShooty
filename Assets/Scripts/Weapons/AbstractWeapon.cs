@@ -17,6 +17,7 @@ public abstract class AbstractWeapon : MonoBehaviour
 
     void Awake()
     {
+        m_BulletPrefab.SetActive(false);
         SpawnBulletsInPool();
         SetUpConfigTime();
         m_Ready = true;
@@ -36,7 +37,7 @@ public abstract class AbstractWeapon : MonoBehaviour
 
     void SpawnBulletsInPool()
     {
-        PoolManager.Instance.warmPool(m_BulletPrefab, 50);
+        PoolManager.Instance.warmPool(m_BulletPrefab, 10);
     }
 
     protected GameObject GetBullet(Vector3 position, Quaternion rotation)
@@ -52,13 +53,13 @@ public abstract class AbstractWeapon : MonoBehaviour
             m_Ready = false;
             GameObject bulletToFire = GetBullet(transform.position, Quaternion.identity);
             bulletToFire.SetActive(true);
-            Debug.Log(m_BulletSpawnPos);
             Rigidbody bulletRigid = bulletToFire.GetComponent<Rigidbody>();
             bulletRigid.position = m_BulletSpawnPos.position;
             Vector3 rotation = bulletToFire.transform.rotation.eulerAngles;
             bulletRigid.rotation = Quaternion.Euler(rotation.x, transform.eulerAngles.y, rotation.z);
             Vector3 direction = inTarget.position - transform.position;
-            bulletRigid.AddForce(direction * m_BulletSpeed, ForceMode.Impulse);
+            direction.y = 0;
+            bulletRigid.AddForce(direction * m_BulletSpeed, ForceMode.Force);
             StartCoroutine(onMaxDistanceReached(bulletToFire));
         }
     }
@@ -66,7 +67,7 @@ public abstract class AbstractWeapon : MonoBehaviour
     IEnumerator onMaxDistanceReached(GameObject inBullet)
     {
         yield return m_MaxDistance;
-        PoolManager.Instance.releaseObject(inBullet);
+        inBullet.GetComponent<Projectile>().onProjectileFinish();
     }
 
     protected abstract void SetUpConfigTime();

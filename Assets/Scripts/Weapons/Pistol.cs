@@ -12,8 +12,8 @@ public class Pistol : AbstractWeapon
 
     protected override void SetUpConfigTime()
     {
-        m_BulletSpeed = 20;
+        m_BulletSpeed = 50;
         m_MaxDistance = new WaitForSeconds(5);
-        m_RecoilWaitTime = 0.5f;
+        m_RecoilWaitTime = 1f;
     }
 }

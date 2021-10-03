@@ -45,6 +45,7 @@ public class PlayerController : MonoBehaviour
         m_RangeSensor = sensor.GetComponent<RangeSensor>();
         m_RangeSensor.Init(this);
         sensor.transform.SetAsLastSibling();
+        sensor.transform.localPosition = Vector3.zero;
     }
 
     // Update is called once per frame
@@ -53,6 +54,7 @@ public class PlayerController : MonoBehaviour
         if (m_Moving)
         {
             Vector3 direction = Vector3.forward * m_JoystickController.Vertical + Vector3.right * m_JoystickController.Horizontal;
+            direction.y = 0;
             transform.rotation = Quaternion.LookRotation(direction);
             direction.y = m_Gravity;
             m_Player.Move(direction * m_PlayerMoveSpeed * Time.deltaTime);
@@ -93,6 +95,7 @@ public class PlayerController : MonoBehaviour
         if (inTarget != null)
         {
             Vector3 direction = inTarget.transform.position - transform.position;
+            direction.y = 0;
             transform.rotation = Quaternion.LookRotation(direction);
             m_CurrentWeapon.Fire(inTarget.transform);
         }
