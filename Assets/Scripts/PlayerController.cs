@@ -24,7 +24,7 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         mGroundDistance = m_Player.bounds.extents.y;
-        // SpawnRangeSensor();
+        SpawnRangeSensor();
     }
 
     void SpawnRangeSensor()
