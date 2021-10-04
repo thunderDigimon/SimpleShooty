@@ -1,0 +1,32 @@
+{
+  "levels": [
+    {
+      "zone_scene": "defaultLevel",
+      "stages": [
+        {
+          "enemy_count": 1
+        },
+        {
+          "enemy_count": 2
+        },
+        {
+          "enemy_count": 3
+        }
+      ]
+    },
+    {
+      "zone_scene": "defaultLevel",
+      "stages": [
+        {
+          "enemy_count": 1
+        },
+        {
+          "enemy_count": 2
+        },
+        {
+          "enemy_count": 3
+        }
+      ]
+    }
+  ]
+}

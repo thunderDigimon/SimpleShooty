@@ -1,3 +1,5 @@
+using System;
+using System.Collections;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -19,19 +21,28 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField]
     private float m_Gravity;
-
     private float mGroundDistance;
     private bool m_Moving;
-
     private RangeSensor m_RangeSensor;
+    private bool m_Killed = false;
 
-    void Start()
+    void OnEnable()
     {
+        Camera.main.GetComponent<CameraFollow>().Target = transform;
+        m_JoystickController = GameObject.FindObjectOfType<VariableJoystick>();
         mGroundDistance = m_Player.bounds.extents.y;
         SpawnRangeSensor();
 
         GameEventManager.Instance.UnregisterEventObserver(GameEvent.POINTER_STATUS, OnPointerStatus);
         GameEventManager.Instance.RegisterEventObserver(GameEvent.POINTER_STATUS, OnPointerStatus);
+
+        GameEventManager.Instance.UnregisterEventObserver(GameEvent.PLAYER_KILLED, OnPlayerKilled);
+        GameEventManager.Instance.RegisterEventObserver(GameEvent.PLAYER_KILLED, OnPlayerKilled);
+    }
+
+    private void OnPlayerKilled(object obj)
+    {
+        m_Killed = true;
     }
 
     void OnPointerStatus(object inStatus)
@@ -51,6 +62,9 @@ public class PlayerController : MonoBehaviour
     // Update is called once per frame
     public void FixedUpdate()
     {
+        if (m_Killed)
+            return;
+
         if (m_Moving)
         {
             Vector3 direction = Vector3.forward * m_JoystickController.Vertical + Vector3.right * m_JoystickController.Horizontal;
@@ -73,12 +87,27 @@ public class PlayerController : MonoBehaviour
         if (!isGrounded())
         {
             m_Gravity += (Physics.gravity.y) * Time.deltaTime;
+
+            if (!m_PlayerFalling)
+            {
+                m_PlayerFalling = true;
+                StartCoroutine(PlayerFalling());
+            }
         }
         else
         {
             m_Gravity = 0f;
         }
     }
+
+    private IEnumerator PlayerFalling()
+    {
+        yield return new WaitForSeconds(3f);
+        GameEventManager.Instance.TriggerEvent(GameEvent.PLAYER_KILLED);
+    }
+
+    bool m_PlayerFalling = false;
+
 
     bool isGrounded()
     {
@@ -96,9 +125,10 @@ public class PlayerController : MonoBehaviour
         }
     }
 
-    void OnDestroy()
+    void OnDisable()
     {
         GameEventManager.Instance.UnregisterEventObserver(GameEvent.POINTER_STATUS, OnPointerStatus);
+        GameEventManager.Instance.UnregisterEventObserver(GameEvent.PLAYER_KILLED, OnPlayerKilled);
     }
 
 }

@@ -16,6 +16,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     {
         m_Killed = false;
         m_Player = null;
+        SetUpEnemyConfig();
     }
 
     public void OnPlayerOutRange(object obj)
@@ -53,6 +54,7 @@ public abstract class AbstractEnemy : MonoBehaviour
 
     void onKilled(GameObject go)
     {
+        m_Killed = true;
         OnKilledBy(go);
         GameEventManager.Instance.TriggerEvent(GameEvent.ENEMY_KILLED, gameObject);
         StartCoroutine(addBackToPool());
@@ -66,7 +68,7 @@ public abstract class AbstractEnemy : MonoBehaviour
     }
 
     protected abstract void OnKilledBy(GameObject go);
-    protected abstract void SetUpEnemyConfig(GameObject go);
+    protected abstract void SetUpEnemyConfig();
 
     bool isBullet(string inTag)
     {
@@ -94,7 +96,7 @@ public abstract class AbstractEnemy : MonoBehaviour
                 if (distance < 1)
                 {
                     m_Killed = true;
-                    GameEventManager.Instance.TriggerEvent(GameEvent.ENEMY_KILLED, gameObject);
+                    GameEventManager.Instance.TriggerEvent(GameEvent.PLAYER_KILLED);
                 }
             }
         }

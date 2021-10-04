@@ -4,7 +4,8 @@ using System.Collections.Generic;
 public enum GameEvent
 {
     POINTER_STATUS,
-    ENEMY_KILLED
+    ENEMY_KILLED,
+    PLAYER_KILLED
 }
 
 public class GameEventManager : Singleton<GameEventManager>

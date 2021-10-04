@@ -7,5 +7,6 @@ public class Constants
     public const string kTagProjectile = "Projectile";
     public const string kTagEnemy = "Enemy";
     public const string kTagPlayer = "Player";
+    public const string kLevelConfigFile = "level_config";
 
 }

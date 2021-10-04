@@ -91,8 +91,9 @@ public class RangeSensor : MonoBehaviour
         }
     }
 
-    void OnDestroy()
+    void OnDisable()
     {
+        Debug.Log("XXXXXX");
         GameEventManager.Instance.UnregisterEventObserver(GameEvent.ENEMY_KILLED, onEnemyKilled);
     }
 

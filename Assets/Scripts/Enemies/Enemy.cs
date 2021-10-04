@@ -9,7 +9,7 @@ public class Enemy : AbstractEnemy
 
     }
 
-    protected override void SetUpEnemyConfig(GameObject go)
+    protected override void SetUpEnemyConfig()
     {
         m_Speed = 2;
         m_Strength = 10;
