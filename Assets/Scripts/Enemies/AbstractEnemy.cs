@@ -5,10 +5,12 @@ using UnityEngine;
 
 public abstract class AbstractEnemy : MonoBehaviour
 {
-    private float m_Speed = 0.2f;
+    protected float m_Speed = 1f;
     protected float m_Strength = 50;
+    protected float m_OnHitDeductVal = 2;
+
     private GameObject m_Player;
-    bool m_Killed = false;
+    private bool m_Killed = false;
 
     void Awake()
     {
@@ -40,7 +42,7 @@ public abstract class AbstractEnemy : MonoBehaviour
 
     void OnBulletHit(GameObject go)
     {
-        m_Strength -= 2;
+        m_Strength -= m_OnHitDeductVal;
         if (m_Strength <= 0)
         {
             onKilled(go);
@@ -53,9 +55,18 @@ public abstract class AbstractEnemy : MonoBehaviour
     {
         OnKilledBy(go);
         GameEventManager.Instance.TriggerEvent(GameEvent.ENEMY_KILLED, gameObject);
+        StartCoroutine(addBackToPool());
+        gameObject.SetActive(false);
+    }
+
+    IEnumerator addBackToPool()
+    {
+        yield return new WaitForSeconds(1f);
+        PoolManager.Instance.releaseObject(gameObject);
     }
 
     protected abstract void OnKilledBy(GameObject go);
+    protected abstract void SetUpEnemyConfig(GameObject go);
 
     bool isBullet(string inTag)
     {

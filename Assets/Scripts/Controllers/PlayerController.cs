@@ -18,7 +18,7 @@ public class PlayerController : MonoBehaviour
     private CharacterController m_Player;
 
     [SerializeField]
-    public float m_Gravity;
+    private float m_Gravity;
 
     private float mGroundDistance;
     private bool m_Moving;

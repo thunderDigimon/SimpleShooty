@@ -8,4 +8,11 @@ public class Enemy : AbstractEnemy
     {
 
     }
+
+    protected override void SetUpEnemyConfig(GameObject go)
+    {
+        m_Speed = 2;
+        m_Strength = 10;
+        m_OnHitDeductVal = 3;
+    }
 }

@@ -4,16 +4,15 @@ using UnityEngine;
 
 public class Pistol : AbstractWeapon
 {
-
     protected override void OnRecoiled()
     {
 
     }
 
-    protected override void SetUpConfigTime()
+    protected override void SetUpWeaponConfig()
     {
-        m_BulletSpeed = 50;
-        m_MaxDistance = new WaitForSeconds(5);
-        m_RecoilWaitTime = 1f;
+        m_BulletSpeed = 70;
+        m_MaxDistance = new WaitForSeconds(2);
+        m_RecoilWaitTime = 0.75f;
     }
 }

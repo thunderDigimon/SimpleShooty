@@ -19,7 +19,7 @@ public abstract class AbstractWeapon : MonoBehaviour
     {
         m_BulletPrefab.SetActive(false);
         SpawnBulletsInPool();
-        SetUpConfigTime();
+        SetUpWeaponConfig();
         m_Ready = true;
     }
 
@@ -70,6 +70,6 @@ public abstract class AbstractWeapon : MonoBehaviour
         inBullet.GetComponent<Projectile>().onProjectileFinish();
     }
 
-    protected abstract void SetUpConfigTime();
+    protected abstract void SetUpWeaponConfig();
     protected abstract void OnRecoiled();
 }
